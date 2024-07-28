@@ -53,6 +53,13 @@ resource "aws_security_group" "hish_web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags={
     Name="hish-web-sg"
   }
@@ -83,11 +90,18 @@ resource "aws_instance" "server" {
             "sudo apt update -y",
             "sudo apt install -y python3-pip",
             "cd /home/ubuntu",
-            "sudo pip3 install flask",
-            "sudo nohup python3 app.py &"
-            # nohup ensures that the process is not terminated when the session is closed. The & at the end of the command places the process in the background, allowing the terminal to be used for other commands.
+            "sudo apt install python3-flask -y",
+            # "sudo nohup python3 app.py &",
+            # "sudo nohup python3 app.py > app.log 2>&1 &",
+            # "echo 'app.py should now be running in the background.'"
+            "sudo python3 app.py"
         ]
     }
+            # nohup ensures that the process is not terminated when the session is closed. The & at the end of the command places the process in the background, allowing the terminal to be used for other commands.
+
+    provisioner "local-exec" {
+        command = "echo 'Instance ${self.id} created successfully with IP ${self.public_ip}'"
+    } 
 }
 
 
